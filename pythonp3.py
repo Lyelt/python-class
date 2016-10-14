@@ -8,23 +8,26 @@ import stat
 import shutil
 
 print ("This program will merge two source directories into a destination directory.")
-inputString = input ("Enter the two sources to be merged and the destination: ")
-inputList = inputString.split()
 
-if len(inputList) != 3:
-    print("Please enter exactly 2 source directories and one destination directory.")
-    
-for i in range(0,3) :
-    inputList[i] = osp.abspath(inputList[i])
-    if osp.isdir(inputList[i]) : 
-        print("Input ", i+1, ": ", inputList[i])
-    elif i == 2 :
-        os.mkdir(inputList[i])
-        print("Destination: ", inputList[i])
-    else :
-        print("Input ", i+1, " is not a valid directory name.")
+def getInput () :
+    if len(sys.argv) != 4:
+        print("Must enter exactly 2 source directories and 1 destination.")
         sys.exit()
-    
+        
+    for i in range(1,4) :
+        sys.argv[i] = osp.abspath(sys.argv[i])
+        if osp.isdir(sys.argv[i]) : 
+            print("Input ", i, ": ", sys.argv[i])
+        elif i == 3 :
+            try :
+                os.mkdir(sys.argv[i])
+                print("Destination: ", sys.argv[i])
+            except OSError :
+                print("Destination already exists - cannot merge.")
+                sys.exit()
+        else :
+            print("Input ", i, " is not a valid directory name.")
+            sys.exit()  
 
 def myCopy(source, dest):
     if not osp.exists(dest) :
@@ -77,6 +80,6 @@ def myCopy(source, dest):
 def mergeDirs(source1, source2, dest) :
     myCopy(source1, dest)
     myCopy(source2, dest)
-    
-mergeDirs(inputList[0], inputList[1], inputList[2])
-    
+
+getInput()
+mergeDirs(sys.argv[1], sys.argv[2], sys.argv[3])
