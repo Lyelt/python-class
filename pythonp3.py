@@ -40,7 +40,6 @@ def myCopy(source, dest):
     destList = os.listdir(dest) # List of contents of dest folder
     try :
         contents = os.listdir(source) # List of contents of source
-        #print (source, "contains: ", contents)
     except PermissionError :
         print("Permission error - can't get contents of", source)
         os.chdir(osp.dirname(source))
@@ -53,34 +52,25 @@ def myCopy(source, dest):
         
         if osp.isdir(newSrc) :
             # If the found item is a directory, recursively copy its contents
-            #print(newSrc, " is a directory. Copying to ", newDest)
             myCopy(newSrc, newDest)
             
         elif stat.S_ISLNK(filestats.st_mode) :
             # If the item is a link, follow the link and copy it
-            #print(newSrc, " is a symbolic link.")
-            #print("Copying ", newSrc, " to ", newDest)
             shutil.copy2(newSrc, newDest)
             
         elif osp.isfile(newSrc)  :
             # If item is a file, check if it matches an existing file
-            #print(newSrc, " is a file.")
-            #print("Copying ", newSrc, " to ", newDest)
             if osp.exists(newDest):
                 os.chdir(osp.dirname(newDest))
-                #print("Found identical files! Copying newer version.")
                 time1 = osp.getmtime(osp.abspath(newSrc))
                 # Compare file modification times, copy the newer version
                 for file in destList :
-                    #print (file, " found in ", osp.abspath(file))
                     if osp.basename(file) == osp.basename(newSrc) :
                         time2 = osp.getmtime(osp.abspath(file))
                         newSrc2 = osp.join(source, file)
                     if time1 < time2 :
-                        #print("The existing file is newer. No file copied")
                         continue
                     else :
-                        #print("Copying ", newSrc2, " to ", newDest)
                         shutil.copy2(newSrc2, newDest)
             else :
                 shutil.copy2(newSrc, newDest)
